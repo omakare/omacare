@@ -94,7 +94,7 @@ export default function Home() {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-4xl font-bold mb-2 text-center">Omacare</h1>
-      <p className="text-xl mb-8 text-center text-gray-600">Omakase for your Care</p>
+      <p className="text-xl mb-8 text-center text-gray-600">Omakase tools for your Care</p>
       
       <div className="mb-4">
         <div className="flex border-b">

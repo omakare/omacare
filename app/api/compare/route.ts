@@ -5,9 +5,27 @@ import Ollama from 'ollama';
 import winston from 'winston';
 import path from 'path';
 
-// Logger configuration remains the same
+// Configure Winston logger
 const logger = winston.createLogger({
-  // ... (logger configuration remains unchanged)
+  level: 'info',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.printf(({ timestamp, level, message }) => {
+      return `${timestamp} ${level}: ${message}`;
+    })
+  ),
+  transports: [
+    new winston.transports.Console({
+      format: winston.format.combine(
+        winston.format.colorize(),
+        winston.format.simple()
+      )
+    }),
+    new winston.transports.File({ 
+      filename: path.join(process.cwd(), 'logs', 'api.log'),
+      format: winston.format.json()
+    })
+  ]
 });
 
 const openai = new OpenAI({
@@ -24,7 +42,7 @@ async function getChatGPTResponse(prompt: string) {
     messages: [{ role: "user", content: prompt }],
     max_tokens: 150,
   });
-  return response.choices[0].message.content.trim();
+  return response.choices[0]?.message?.content?.trim() ?? 'No response received';
 }
 
 async function getHaikuResponse(prompt: string) {
@@ -33,15 +51,23 @@ async function getHaikuResponse(prompt: string) {
     max_tokens: 150,
     messages: [{ role: "user", content: prompt }],
   });
-  return response.content[0].text;
+  return response.content
+    .filter(block => block.type === 'text')
+    .map(block => (block as { text: string }).text)
+    .join(' ') || 'No response received';
 }
 
 async function getOllamaResponse(prompt: string) {
-  const response = await Ollama.chat({
-    model: 'llama3',
-    messages: [{ role: 'user', content: prompt }],
-  });
-  return response.message.content;
+  try {
+    const response = await Ollama.chat({
+      model: 'llama3',
+      messages: [{ role: 'user', content: prompt }],
+    });
+    return response.message.content;
+  } catch (error) {
+    logger.error('Error calling Ollama:', error);
+    return 'Error: Unable to get response from Ollama';
+  }
 }
 
 export async function POST(request: Request) {

@@ -4,6 +4,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import Ollama from 'ollama';
 import winston from 'winston';
 import path from 'path';
+// @ts-ignore
 import { getSubtitles } from 'youtube-captions-scraper';
 
 // Use case introductions
@@ -49,6 +50,7 @@ async function getYoutubeTranscript(videoUrl: string): Promise<string> {
     if (!videoId) throw new Error('Invalid YouTube URL');
 
     const captions = await getSubtitles({ videoID: videoId });
+    // @ts-ignore
     return captions.map(caption => caption.text).join(' ');
   } catch (error) {
     logger.error('Error fetching YouTube transcript:', error);
@@ -102,6 +104,7 @@ Format the response as a list of three researchers, each separated by a blank li
           max_tokens: 1000,
           messages: [{ role: "user", content: researcherPrompt }],
         });
+        // @ts-ignore
         researchersInfo = parseResearcherInfo(haikuResponse.content[0].text);
         break;
 
@@ -158,6 +161,7 @@ Provide a concise answer from each researcher's perspective, and include citatio
             { role: "user", content: userPrompt }
           ],
         });
+        // @ts-ignore
         return haikuResponse.content[0].text;
 
       case 'ollama':
@@ -202,6 +206,7 @@ async function getCareGroupsResponse(model: 'chatgpt' | 'haiku' | 'ollama', prom
             { role: "user", content: userPrompt }
           ],
         });
+        // @ts-ignore
         return haikuResponse.content[0].text;
 
       case 'ollama':
@@ -246,6 +251,7 @@ async function getGrantsResponse(model: 'chatgpt' | 'haiku' | 'ollama', prompt: 
             { role: "user", content: userPrompt }
           ],
         });
+        // @ts-ignore
         return haikuResponse.content[0].text;
 
       case 'ollama':
@@ -291,6 +297,7 @@ async function getPatientWebinarsResponse(model: 'chatgpt' | 'haiku' | 'ollama',
             { role: "user", content: userPrompt }
           ],
         });
+        // @ts-ignore
         return haikuResponse.content[0].text;
 
       case 'ollama':
